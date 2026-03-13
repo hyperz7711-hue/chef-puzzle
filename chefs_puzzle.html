@@ -1,0 +1,1277 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>🍳 Chef's Puzzle v7</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;700;800;900&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{--or:#FF6B35;--yw:#FFD23F;--gn:#43A047;--rd:#E53935;}
+body{background:radial-gradient(ellipse at 40% 10%,#3d1800 0%,#1a0900 55%,#080300 100%);
+  min-height:100vh;display:flex;flex-direction:column;align-items:center;
+  padding:8px 6px 20px;font-family:'Nunito',sans-serif;overflow-x:hidden;}
+
+/* ════ SETTINGS ════ */
+#S{width:100%;max-width:430px;display:flex;flex-direction:column;align-items:center;gap:10px;padding-top:4px;}
+.logo{font-family:'Fredoka One',cursive;font-size:26px;color:var(--yw);text-shadow:3px 3px 0 #7a3000;text-align:center;}
+.logo small{font-size:15px;display:block;color:rgba(255,255,255,0.4);font-family:'Nunito',sans-serif;font-weight:800;margin-top:1px;}
+.sec-title{font-family:'Fredoka One',cursive;font-size:13px;color:var(--yw);margin-bottom:6px;width:100%;}
+
+/* Stage cards */
+.stage-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;width:100%;}
+.stg-card{background:rgba(255,255,255,0.055);border:2px solid rgba(255,255,255,0.09);
+  border-radius:13px;padding:9px;cursor:pointer;transition:all 0.18s;text-align:center;}
+.stg-card:hover{background:rgba(255,255,255,0.09);}
+.stg-card.on{border-color:var(--yw);background:rgba(255,210,63,0.11);box-shadow:0 0 12px rgba(255,210,63,0.22);}
+.stg-card .em{font-size:28px;margin-bottom:3px;}
+.stg-card .nm{font-family:'Fredoka One',cursive;font-size:13px;color:var(--yw);}
+.stg-card .ig{font-size:9px;color:rgba(255,255,255,0.4);font-weight:700;margin-top:2px;}
+.stg-card .bk{font-size:8px;background:rgba(255,107,53,0.3);color:#FFB570;border-radius:5px;padding:1px 5px;font-weight:900;margin-top:3px;display:inline-block;}
+
+/* Chance mode cards */
+.cm-list{display:flex;flex-direction:column;gap:5px;width:100%;}
+.cm{display:flex;align-items:center;gap:9px;background:rgba(255,255,255,0.04);
+  border:2px solid rgba(255,255,255,0.08);border-radius:11px;padding:8px 11px;cursor:pointer;transition:all 0.18s;}
+.cm:hover{background:rgba(255,255,255,0.08);}
+.cm.on{border-color:var(--or);background:rgba(255,107,53,0.11);box-shadow:0 0 10px rgba(255,107,53,0.18);}
+.cm-ic{font-size:20px;width:32px;text-align:center;flex-shrink:0;}
+.cm-nm{font-family:'Fredoka One',cursive;font-size:12px;color:var(--yw);}
+.cm-ds{font-size:9px;color:rgba(255,255,255,0.38);font-weight:700;margin-top:1px;}
+
+/* Settings card */
+.sc{width:100%;background:rgba(255,248,240,0.97);border-radius:14px;padding:11px 13px;box-shadow:0 5px 20px rgba(0,0,0,0.28);}
+.sc h3{font-family:'Fredoka One',cursive;font-size:13px;color:var(--or);margin-bottom:9px;border-bottom:2px solid rgba(255,107,53,0.1);padding-bottom:5px;}
+.presets{display:flex;gap:5px;margin-bottom:9px;}
+.pb{flex:1;padding:7px 4px;border:none;border-radius:10px;font-family:'Fredoka One',cursive;font-size:12px;cursor:pointer;transition:transform 0.1s;box-shadow:0 3px 8px rgba(0,0,0,0.22);}
+.pb.easy{background:linear-gradient(135deg,#43A047,#66BB6A);color:#fff;}
+.pb.normal{background:linear-gradient(135deg,#FF8C00,#FFB300);color:#fff;}
+.pb.hard{background:linear-gradient(135deg,#E53935,#FF5252);color:#fff;}
+.pb.on{transform:translateY(-2px);box-shadow:0 4px 13px rgba(0,0,0,0.32),0 0 0 2px rgba(255,255,255,0.26);}
+.sr{display:flex;flex-direction:column;gap:3px;margin-bottom:9px;}
+.sr:last-child{margin-bottom:0;}
+.st{display:flex;justify-content:space-between;align-items:center;}
+.sl{font-size:10.5px;font-weight:900;color:#3a1800;}
+.sl span{font-size:8px;color:#bbb;margin-left:2px;font-weight:700;}
+.sv{font-family:'Fredoka One',cursive;font-size:14px;color:var(--or);background:rgba(255,107,53,0.08);border-radius:6px;padding:2px 7px;min-width:42px;text-align:center;}
+.sd{font-size:8.5px;color:#aaa;font-weight:700;}
+input[type=range]{-webkit-appearance:none;width:100%;height:6px;border-radius:3px;outline:none;cursor:pointer;
+  background:linear-gradient(90deg,var(--or) var(--pct,50%),#e0d0c8 var(--pct,50%));}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;
+  background:#fff;border:3px solid var(--or);box-shadow:0 2px 5px rgba(255,107,53,0.28);cursor:pointer;}
+
+/* Summary */
+.sbox{width:100%;background:rgba(255,255,255,0.04);border:1.5px solid rgba(255,210,63,0.16);border-radius:11px;padding:8px 11px;}
+.sbox h4{font-size:7.5px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:1.2px;font-weight:800;margin-bottom:6px;}
+.sg{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;}
+.si{display:flex;flex-direction:column;}
+.sil{font-size:8px;color:rgba(255,255,255,0.32);font-weight:700;}
+.siv{font-family:'Fredoka One',cursive;font-size:12px;color:var(--yw);}
+.start{width:100%;padding:12px;border:none;border-radius:13px;background:linear-gradient(135deg,var(--or),#ff9020);
+  font-family:'Fredoka One',cursive;font-size:20px;color:#fff;cursor:pointer;
+  box-shadow:0 5px 14px rgba(255,107,53,0.38);transition:transform 0.1s;}
+.start:hover{transform:translateY(-2px);}
+
+/* ════ GAME ════ */
+#G{display:none;width:100%;max-width:430px;}
+.hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;gap:3px;}
+.glogo{font-family:'Fredoka One',cursive;font-size:14px;color:var(--yw);text-shadow:2px 2px 0 #7a3000;white-space:nowrap;}
+.hstats{display:flex;gap:3px;}
+.hb{background:rgba(255,255,255,0.07);border:1.5px solid rgba(255,210,63,0.2);border-radius:9px;padding:2px 7px;text-align:center;min-width:50px;}
+.hl{font-size:6px;color:rgba(255,255,255,0.34);letter-spacing:1px;text-transform:uppercase;}
+.hv{font-family:'Fredoka One',cursive;font-size:16px;color:var(--yw);line-height:1.1;}
+.gbtn{background:rgba(255,255,255,0.07);border:1.5px solid rgba(255,255,255,0.09);border-radius:8px;padding:4px 7px;font-size:15px;cursor:pointer;}
+
+/* Queue */
+.qw{margin-bottom:5px;}
+.qh{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;}
+.ql{font-size:7px;color:rgba(255,255,255,0.32);letter-spacing:1.2px;text-transform:uppercase;font-weight:800;}
+.qwarn{font-size:7px;color:#ff6060;font-weight:900;animation:blR .5s ease-in-out infinite alternate;}
+@keyframes blR{from{opacity:1;}to{opacity:.2;}}
+.qslots{display:flex;gap:4px;}
+.qs{flex:1;min-height:60px;border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:all .22s;}
+.qs.empty{background:rgba(255,255,255,.03);border:1.5px dashed rgba(255,255,255,.08);}
+.qs.filled{background:rgba(255,248,240,.95);box-shadow:0 2px 7px rgba(0,0,0,.2);padding:4px 2px;}
+.qs.filled.urg{border:2px solid rgba(255,60,60,.78);animation:urgP .5s ease-in-out infinite alternate;}
+@keyframes urgP{from{box-shadow:0 2px 7px rgba(255,60,60,.1);}to{box-shadow:0 2px 13px rgba(255,60,60,.48);}}
+.qs.out{animation:qOut .32s ease forwards;}
+@keyframes qOut{to{transform:scale(0) translateY(-15px);opacity:0;}}
+.qd{font-size:17px;line-height:1;margin-bottom:2px;}
+.qp{display:flex;gap:2px;flex-wrap:wrap;justify-content:center;}
+.qdt{width:5px;height:5px;border-radius:50%;background:#ddd;transition:background .14s;}
+.qdt.dn{background:var(--gn);}
+.qdt.ck{background:#ffa030;}
+.qdt.ck.dn{background:var(--gn);}
+.qn{font-size:6px;font-weight:900;color:#bbb;margin-top:1px;}
+
+/* Cooker */
+.ckr{width:100%;border-radius:12px;padding:7px 10px;margin-bottom:5px;position:relative;overflow:hidden;transition:background .28s,border-color .28s;}
+.ckr.idle{background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.07);}
+.ckr.active{background:linear-gradient(135deg,rgba(255,140,0,.17),rgba(255,60,0,.1));border:2px solid rgba(255,160,0,.46);animation:ckg 1.1s ease-in-out infinite alternate;}
+@keyframes ckg{from{box-shadow:0 0 8px rgba(255,120,0,.12);}to{box-shadow:0 0 18px rgba(255,120,0,.36);}}
+.ckr.cooking,.ckr.cooking2{background:linear-gradient(135deg,rgba(139,69,19,.2),rgba(100,40,0,.13));border:2px solid rgba(200,130,60,.36);}
+.ckr.flip{background:linear-gradient(135deg,rgba(255,200,0,.23),rgba(255,100,0,.17));border:2px solid rgba(255,220,0,.78);cursor:pointer;animation:ckf .36s ease-in-out infinite alternate;}
+@keyframes ckf{from{box-shadow:0 0 12px rgba(255,200,0,.3);}to{box-shadow:0 0 26px rgba(255,220,0,.65);}}
+.ckr.burned{background:rgba(18,10,3,.52);border:1.5px solid rgba(55,38,22,.22);}
+.crow{display:flex;align-items:center;gap:7px;}
+.cic{font-size:26px;line-height:1;flex-shrink:0;}
+.ckr.active .cic{animation:csz .34s ease-in-out infinite alternate;}
+@keyframes csz{from{transform:rotate(-5deg);}to{transform:rotate(5deg);}}
+.ckr.cooking .cic,.ckr.cooking2 .cic{animation:csh .24s ease infinite;}
+@keyframes csh{0%,100%{transform:translateX(0);}50%{transform:translateX(2px) rotate(2deg);}}
+.ckr.flip .cic{animation:cfb .24s ease-in-out infinite alternate;}
+@keyframes cfb{from{transform:scale(1) rotate(-7deg);}to{transform:scale(1.14) rotate(7deg);}}
+.cinf{flex:1;}
+.ctit{font-family:'Fredoka One',cursive;font-size:12px;line-height:1.2;margin-bottom:2px;}
+.ckr.idle .ctit{color:rgba(255,255,255,.28);}
+.ckr.active .ctit{color:var(--yw);}
+.ckr.cooking .ctit,.ckr.cooking2 .ctit{color:#FFB570;}
+.ckr.flip .ctit{color:#FFE500;font-size:14px;}
+.ckr.burned .ctit{color:#3a3a3a;}
+.csub{font-size:8px;font-weight:800;margin-bottom:3px;color:rgba(255,255,255,.2);}
+.ckr.active .csub{color:rgba(255,220,100,.72);}
+.ckr.cooking .csub,.ckr.cooking2 .csub{color:rgba(255,185,110,.66);}
+.ckr.flip .csub{color:rgba(255,235,148,.82);}
+.ckr.burned .csub{color:#333;}
+.trow{display:flex;align-items:center;gap:4px;}
+.ttrk{flex:1;height:5px;border-radius:3px;background:rgba(255,255,255,.07);overflow:hidden;}
+.tfil{height:100%;border-radius:3px;transition:width .1s linear;}
+.ckr.idle .tfil{background:rgba(255,255,255,.12);}
+.ckr.active .tfil{background:linear-gradient(90deg,#FF6B35,#FFD23F);}
+.ckr.cooking .tfil,.ckr.cooking2 .tfil{background:linear-gradient(90deg,#8B4513,#D2691E);}
+.ckr.flip .tfil{background:linear-gradient(90deg,#FFE500,#FF9000);}
+.ckr.burned .tfil{background:#1c0e05;}
+.ttxt{font-family:'Fredoka One',cursive;font-size:10px;min-width:24px;text-align:right;color:rgba(255,255,255,.22);}
+.ckr.active .ttxt{color:var(--yw);}
+.ckr.cooking .ttxt,.ckr.cooking2 .ttxt{color:#FFB570;}
+.ckr.flip .ttxt{color:#FFE500;}
+.ahint{position:absolute;right:8px;top:50%;transform:translateY(-50%);font-family:'Fredoka One',cursive;font-size:11px;background:rgba(255,220,0,.88);color:#3a1a00;border-radius:7px;padding:3px 7px;animation:ahp .33s ease-in-out infinite alternate;}
+@keyframes ahp{from{transform:translateY(-50%) scale(1);}to{transform:translateY(-54%) scale(1.07);}}
+.stm{position:absolute;top:2px;right:7px;font-size:11px;opacity:0;animation:str 1.2s ease-out infinite;}
+.stm:nth-child(2){animation-delay:.38s;right:17px;}
+.stm:nth-child(3){animation-delay:.76s;right:12px;}
+@keyframes str{0%{opacity:0;transform:translateY(0) scale(.8);}40%{opacity:.55;}100%{opacity:0;transform:translateY(-12px) scale(1.14);}}
+
+/* Chance bar */
+.chbar{width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:6px 8px;margin-bottom:5px;}
+.chbh{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;}
+.chlbl{font-size:7px;color:rgba(255,255,255,.28);text-transform:uppercase;letter-spacing:1.1px;font-weight:800;}
+.chtag{font-size:7.5px;color:rgba(255,210,63,.55);font-weight:900;background:rgba(255,210,63,.07);border-radius:4px;padding:1px 5px;}
+.chslots{display:flex;gap:4px;}
+.chs{flex:1;height:38px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:19px;border:2px solid transparent;transition:transform .12s;position:relative;}
+.chs.empty{background:rgba(255,255,255,.03);border-style:dashed;border-color:rgba(255,255,255,.08);}
+.chs.ready{background:linear-gradient(135deg,rgba(255,240,80,.15),rgba(255,180,0,.09));border-color:rgba(255,210,63,.52);cursor:pointer;animation:chg 1.2s ease-in-out infinite alternate;}
+@keyframes chg{from{box-shadow:0 0 6px rgba(255,200,0,.16);}to{box-shadow:0 0 14px rgba(255,220,0,.42);}}
+.chs.ready:hover{transform:scale(1.1);}
+.chs.board-info{background:rgba(255,255,255,.03);border-color:rgba(255,255,255,.08);cursor:default;font-size:10px;color:rgba(255,255,255,.25);}
+
+/* Board */
+.bwrap{background:linear-gradient(145deg,#4a2810,#7a4820,#3a1c08);border-radius:14px;padding:6px;
+  box-shadow:0 6px 24px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.05);margin-bottom:5px;}
+.binn{background:rgba(0,0,0,.16);border-radius:8px;padding:3px;}
+.board{display:grid;grid-template-columns:repeat(6,54px);grid-template-rows:repeat(6,54px);gap:3px;}
+
+/* Tiles */
+.tile{width:54px;height:54px;border-radius:10px;display:flex;align-items:center;justify-content:center;
+  font-size:24px;cursor:pointer;user-select:none;border:2px solid transparent;
+  box-shadow:0 3px 5px rgba(0,0,0,.17),inset 0 1px 0 rgba(255,255,255,.2);
+  transition:transform .1s,box-shadow .1s;position:relative;}
+.tile:hover:not(.busy){transform:scale(1.07);}
+.tile.sel{border-color:rgba(255,255,255,.83);transform:scale(1.12);z-index:5;
+  box-shadow:0 0 0 3px rgba(255,255,255,.25),0 4px 12px rgba(0,0,0,.25);}
+.t0{background:linear-gradient(145deg,#e8c070,#b88535);}
+.t1{background:linear-gradient(145deg,#ffe070,#e0a800);}
+.t2{background:linear-gradient(145deg,#e08080,#a82828);}
+.t3{background:linear-gradient(145deg,#82dc90,#2e8c3a);}
+.t4{background:linear-gradient(145deg,#ff9966,#cc3300);}
+/* per-stage color overrides applied inline */
+/* chance tiles */
+.tc5{background:linear-gradient(145deg,#fffbe0,#ffe044);border-color:rgba(255,210,0,.62);font-size:20px;animation:cgt1 1.1s ease-in-out infinite alternate;}
+.tc6{background:linear-gradient(145deg,#d0f0ff,#68c8ff);border-color:rgba(80,180,255,.58);font-size:20px;animation:cgt2 1.1s ease-in-out infinite alternate;}
+.tc7{background:linear-gradient(145deg,#ffd0f0,#ff68c4);border-color:rgba(255,80,200,.58);font-size:20px;animation:cgt3 1s ease-in-out infinite alternate;}
+.tc8{background:linear-gradient(145deg,#d0ffd8,#4ee868);border-color:rgba(50,200,80,.58);font-size:20px;animation:cgt4 1.15s ease-in-out infinite alternate;}
+.tc9{background:linear-gradient(145deg,#ffe0b8,#ffa028);border-color:rgba(255,160,0,.62);font-size:20px;animation:cgt5 .95s ease-in-out infinite alternate;}
+@keyframes cgt1{from{box-shadow:0 0 7px rgba(255,210,0,.35);}to{box-shadow:0 0 18px rgba(255,230,0,.68);}}
+@keyframes cgt2{from{box-shadow:0 0 7px rgba(80,180,255,.26);}to{box-shadow:0 0 16px rgba(100,200,255,.58);}}
+@keyframes cgt3{from{box-shadow:0 0 7px rgba(255,80,200,.26);}to{box-shadow:0 0 16px rgba(255,100,220,.58);}}
+@keyframes cgt4{from{box-shadow:0 0 7px rgba(50,200,80,.26);}to{box-shadow:0 0 16px rgba(60,220,100,.58);}}
+@keyframes cgt5{from{box-shadow:0 0 7px rgba(255,160,0,.26);}to{box-shadow:0 0 16px rgba(255,180,0,.58);}}
+.board.cka .cookable{animation:ckpls .78s ease-in-out infinite;}
+@keyframes ckpls{0%,100%{box-shadow:0 3px 5px rgba(0,0,0,.17);}50%{box-shadow:0 0 14px rgba(255,160,0,.9),0 3px 5px rgba(0,0,0,.17);}}
+.tile.pop{animation:tpop .3s ease forwards;}
+@keyframes tpop{0%{transform:scale(1);opacity:1;}50%{transform:scale(1.24);filter:brightness(1.5);}100%{transform:scale(0);opacity:0;}}
+.tile.drop{animation:tdrop .25s cubic-bezier(.25,1.5,.5,1) forwards;}
+@keyframes tdrop{from{transform:translateY(-26px) scale(.8);opacity:0;}to{transform:translateY(0) scale(1);opacity:1;}}
+.tile.shk{animation:tshk .24s ease;}
+@keyframes tshk{0%,100%{transform:translateX(0);}25%{transform:translateX(-5px);}75%{transform:translateX(5px);}}
+.tile.cburst{animation:tcb .36s ease forwards;}
+@keyframes tcb{0%{transform:scale(1);filter:brightness(1);}50%{transform:scale(1.5);filter:brightness(2.2);}100%{transform:scale(0);opacity:0;}}
+
+/* Tray */
+.tray{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:5px 8px;}
+.trylbl{font-size:7px;color:rgba(255,255,255,.28);text-transform:uppercase;letter-spacing:1.1px;font-weight:800;margin-bottom:4px;}
+.tryitems{display:flex;gap:3px;justify-content:center;}
+.ti{display:flex;flex-direction:column;align-items:center;gap:1px;flex:1;}
+.te{font-size:16px;line-height:1;}
+.tn{font-family:'Fredoka One',cursive;font-size:11px;color:#fff;background:rgba(255,255,255,.08);
+  border-radius:5px;padding:1px 5px;min-width:22px;text-align:center;transition:background .13s,color .13s;}
+.tn.hi{background:rgba(255,210,63,.25);color:var(--yw);}
+.tck{display:flex;flex-direction:column;align-items:center;gap:1px;flex:1;}
+.tcktp{position:relative;display:inline-block;}
+.tckbg{position:absolute;top:-4px;right:-5px;font-size:6px;background:var(--or);color:#fff;
+  border-radius:4px;padding:0 2px;font-weight:900;line-height:10px;}
+.tckn{font-family:'Fredoka One',cursive;font-size:11px;background:rgba(255,140,0,.13);color:#FFB570;
+  border-radius:5px;padding:1px 5px;min-width:22px;text-align:center;}
+.tckn.hi{background:rgba(255,210,63,.24);color:var(--yw);}
+
+/* Overlays */
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.68);display:flex;align-items:center;justify-content:center;z-index:900;animation:fdi .22s ease;}
+@keyframes fdi{from{opacity:0;}to{opacity:1;}}
+.ovc{border-radius:20px;padding:22px 28px;text-align:center;box-shadow:0 15px 44px rgba(0,0,0,.46);animation:bci .36s cubic-bezier(.25,1.5,.5,1);}
+@keyframes bci{from{transform:scale(.4);}to{transform:scale(1);}}
+.ovc.win{background:linear-gradient(145deg,#fff9f0,#ffe8cc);}
+.ovc.over{background:linear-gradient(145deg,#fff0f0,#ffd4d4);}
+.ove{font-size:54px;margin-bottom:4px;}
+.ovt{font-family:'Fredoka One',cursive;font-size:24px;margin-bottom:3px;}
+.ovc.win .ovt{color:var(--or);}
+.ovc.over .ovt{color:#c02020;}
+.ovs{font-size:11px;font-weight:700;color:#888;margin-bottom:2px;}
+.ovst{font-family:'Fredoka One',cursive;font-size:13px;color:#666;margin-bottom:11px;line-height:1.6;}
+.ovbs{display:flex;gap:6px;}
+.ovb{flex:1;padding:9px;border:none;border-radius:10px;font-family:'Fredoka One',cursive;font-size:13px;color:#fff;cursor:pointer;transition:transform .1s;}
+.ovb:hover{transform:translateY(-2px);}
+.ovc.win .ovb.p{background:linear-gradient(135deg,var(--or),#ff9020);}
+.ovc.over .ovb.p{background:linear-gradient(135deg,#e53935,#ff5252);}
+.ovb.s{background:#aaa;}
+
+/* Chance effect popup */
+.chfx{position:fixed;top:50%;left:50%;font-family:'Fredoka One',cursive;font-size:17px;
+  text-align:center;pointer-events:none;z-index:750;background:rgba(0,0,0,.72);
+  border-radius:14px;padding:11px 18px;border:3px solid;
+  animation:chfxa 1.55s ease forwards;}
+@keyframes chfxa{0%{opacity:0;transform:translate(-50%,-50%) scale(.6);}18%{opacity:1;transform:translate(-50%,-50%) scale(1.04);}68%{opacity:1;transform:translate(-50%,-50%) scale(1);}100%{opacity:0;transform:translate(-50%,-52%) scale(.76);}}
+
+/* Floating pops */
+.fp{position:fixed;font-family:'Fredoka One',cursive;pointer-events:none;z-index:700;}
+.fp.sc{font-size:18px;animation:fps .78s ease forwards;}
+@keyframes fps{0%{transform:translateY(0) scale(1.07);opacity:1;}100%{transform:translateY(-42px) scale(.74);opacity:0;}}
+.fp.nt{top:37%;left:50%;font-size:19px;color:var(--yw);text-shadow:2px 2px 0 #903000;text-align:center;animation:fpn 1.45s ease forwards;}
+@keyframes fpn{0%{transform:translate(-50%,-50%) scale(0);opacity:1;}26%{transform:translate(-50%,-50%) scale(1.05);}66%{transform:translate(-50%,-50%) scale(1);opacity:1;}100%{transform:translate(-50%,-58%) scale(.66);opacity:0;}}
+.fp.co{top:43%;left:50%;font-size:34px;color:var(--yw);text-shadow:2px 3px 0 #903000;animation:fpc .6s ease forwards;}
+@keyframes fpc{0%{transform:translate(-50%,-50%) scale(0);opacity:1;}35%{transform:translate(-50%,-50%) scale(1.18) rotate(-4deg);}100%{transform:translate(-50%,-70%) scale(.56);opacity:0;}}
+.flash{position:fixed;inset:0;pointer-events:none;z-index:600;animation:flf .32s ease forwards;}
+.flash.red{background:rgba(200,0,0,.15);}
+.flash.gold{background:rgba(255,200,0,.12);}
+.flash.cyan{background:rgba(0,200,255,.12);}
+.flash.pink{background:rgba(255,80,200,.12);}
+.flash.grn{background:rgba(0,220,80,.12);}
+@keyframes flf{from{opacity:1;}to{opacity:0;}}
+
+/* Drawer */
+.drw{position:fixed;inset:0;background:rgba(0,0,0,.58);display:flex;align-items:flex-end;justify-content:center;z-index:800;animation:fdi .17s ease;}
+.drw.hid{display:none;}
+.drwc{width:100%;max-width:430px;background:#fff9f3;border-radius:16px 16px 0 0;padding:11px 13px 22px;
+  box-shadow:0 -5px 22px rgba(0,0,0,.32);animation:slu .22s cubic-bezier(.25,1.2,.5,1);}
+@keyframes slu{from{transform:translateY(100%);}to{transform:translateY(0);}}
+.drwh{width:32px;height:3px;background:#ddd;border-radius:2px;margin:0 auto 9px;}
+.drwt{font-family:'Fredoka One',cursive;font-size:16px;color:var(--or);margin-bottom:10px;text-align:center;}
+.drwok{display:block;width:100%;padding:10px;border:none;border-radius:10px;
+  background:linear-gradient(135deg,var(--or),#ff9020);font-family:'Fredoka One',cursive;
+  font-size:15px;color:#fff;cursor:pointer;margin-top:11px;}
+</style>
+</head>
+<body>
+
+<!-- ════════ SETTINGS ════════ -->
+<div id="S">
+  <div class="logo">🍳 Chef's Puzzle<small>찬스 방식 A/B/C 비교 테스트 v7</small></div>
+
+  <!-- Stage -->
+  <div class="sec-title">🍽️ 스테이지 선택</div>
+  <div class="stage-grid">
+    <div class="stg-card on" onclick="pickStage(this,'burger')">
+      <div class="em">🍔</div><div class="nm">버거</div>
+      <div class="ig">🍞🧀🥩🥬🍅</div>
+      <div class="bk">🍳 팬 뒤집기</div>
+    </div>
+    <div class="stg-card" onclick="pickStage(this,'pizza')">
+      <div class="em">🍕</div><div class="nm">피자</div>
+      <div class="ig">🫓🍅🧀🍄🫑</div>
+      <div class="bk">🔥 오븐 대기</div>
+    </div>
+    <div class="stg-card" onclick="pickStage(this,'ramen')">
+      <div class="em">🍜</div><div class="nm">라면</div>
+      <div class="ig">🍜🥚🌱🥩💧</div>
+      <div class="bk">🥢 냄비 젓기</div>
+    </div>
+    <div class="stg-card" onclick="pickStage(this,'bibimbap')">
+      <div class="em">🍱</div><div class="nm">비빔밥</div>
+      <div class="ig">🍚🥬🥕🥚🌶️</div>
+      <div class="bk">✨ 조리기구 없음</div>
+    </div>
+  </div>
+
+  <!-- Chance mode -->
+  <div class="sec-title">⚡ 찬스 아이템 등장 방식 (3가지 비교)</div>
+  <div class="cm-list">
+    <div class="cm on" onclick="pickChance(this,'combo')">
+      <div class="cm-ic">🔥</div>
+      <div><div class="cm-nm">A. 콤보 달성 자동 지급</div>
+      <div class="cm-ds">3콤보마다 랜덤 아이템 슬롯에 지급 → 원할 때 탭해서 사용</div></div>
+    </div>
+    <div class="cm" onclick="pickChance(this,'timed')">
+      <div class="cm-ic">⏱</div>
+      <div><div class="cm-nm">B. 시간 주기 슬롯 지급</div>
+      <div class="cm-ds">30초마다 아이템이 슬롯에 등장 → 원할 때 탭해서 사용</div></div>
+    </div>
+    <div class="cm" onclick="pickChance(this,'order')">
+      <div class="cm-ic">🍽️</div>
+      <div><div class="cm-nm">C. 주문 완성 보상</div>
+      <div class="cm-ds">주문 완성 때마다 랜덤 아이템 지급 → 원할 때 탭해서 사용</div></div>
+    </div>
+  </div>
+
+  <!-- Difficulty -->
+  <div class="sc">
+    <h3>⚙️ 난이도 설정</h3>
+    <div class="presets">
+      <button class="pb easy"   onclick="preset('easy')">😊 쉬움</button>
+      <button class="pb normal on" onclick="preset('normal')">😤 보통</button>
+      <button class="pb hard"   onclick="preset('hard')">🔥 어려움</button>
+    </div>
+    <div class="sr">
+      <div class="st"><div class="sl">목표 완성 수 <span>(많을수록 오래)</span></div><div class="sv" id="vWin">20</div></div>
+      <input type="range" id="rWin" min="5" max="40" step="5" value="20" oninput="rng(this,'vWin','')">
+    </div>
+    <div class="sr">
+      <div class="st"><div class="sl">게임오버 주문 한도 <span>(낮을수록 어려움)</span></div><div class="sv" id="vQ">5</div></div>
+      <div class="sd">주문이 이 수 이상 쌓이면 게임 오버</div>
+      <input type="range" id="rQ" min="3" max="8" step="1" value="5" oninput="rng(this,'vQ','')">
+    </div>
+    <div class="sr">
+      <div class="st"><div class="sl">주문 생성 간격</div><div class="sv" id="vOI">18초</div></div>
+      <input type="range" id="rOI" min="8" max="40" step="2" value="18" oninput="rng(this,'vOI','초')">
+    </div>
+    <div class="sr">
+      <div class="st"><div class="sl">조리기구 활성 시간</div><div class="sv" id="vTA">12초</div></div>
+      <input type="range" id="rTA" min="6" max="25" step="1" value="12" oninput="rng(this,'vTA','초')">
+    </div>
+    <div class="sr">
+      <div class="st"><div class="sl">뒤집기/젓기 허용 시간</div><div class="sv" id="vTF">1.5초</div></div>
+      <input type="range" id="rTF" min="1" max="5" step="0.5" value="1.5" oninput="rng(this,'vTF','초')">
+    </div>
+  </div>
+
+  <!-- Summary -->
+  <div class="sbox">
+    <h4>📊 현재 설정 요약</h4>
+    <div class="sg">
+      <div class="si"><div class="sil">스테이지</div><div class="siv" id="sumStg">🍔 버거</div></div>
+      <div class="si"><div class="sil">찬스 방식</div><div class="siv" id="sumCM">A. 콤보</div></div>
+      <div class="si"><div class="sil">목표</div><div class="siv" id="sumW">20개</div></div>
+      <div class="si"><div class="sil">게임오버</div><div class="siv" id="sumQ">5개</div></div>
+      <div class="si"><div class="sil">주문 간격</div><div class="siv" id="sumOI">18초</div></div>
+      <div class="si"><div class="sil">예상 시간</div><div class="siv" id="sumEst">~6분</div></div>
+    </div>
+  </div>
+
+  <button class="start" onclick="startGame()">🍳 게임 시작!</button>
+</div>
+
+<!-- ════════ GAME ════════ -->
+<div id="G">
+  <div class="hdr">
+    <div class="glogo" id="gLogo">🍔 버거</div>
+    <div class="hstats">
+      <div class="hb"><div class="hl">⏱시간</div><div class="hv" id="hTimer">00:00</div></div>
+      <div class="hb"><div class="hl">완성</div><div class="hv" id="hDone">0/?</div></div>
+      <div class="hb"><div class="hl">점수</div><div class="hv" id="hScore">0</div></div>
+    </div>
+    <button class="gbtn" onclick="openDrw()">⚙️</button>
+  </div>
+
+  <!-- Queue -->
+  <div class="qw">
+    <div class="qh">
+      <div class="ql">📋 주문 대기열</div>
+      <div id="qWarn" class="qwarn" style="display:none">⚠️ 곧 게임 오버!</div>
+    </div>
+    <div class="qslots" id="qSlots"></div>
+  </div>
+
+  <!-- Cooker -->
+  <div class="ckr idle" id="cooker">
+    <div class="crow">
+      <div class="cic" id="cIcon">🍳</div>
+      <div class="cinf">
+        <div class="ctit" id="cTitle">준비 중...</div>
+        <div class="csub" id="cSub">잠시 후 달궈집니다</div>
+        <div class="trow">
+          <div class="ttrk"><div class="tfil" id="tFil" style="width:0%"></div></div>
+          <div class="ttxt" id="tTxt">-</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chance bar -->
+  <div class="chbar">
+    <div class="chbh">
+      <div class="chlbl">⚡ 찬스 아이템</div>
+      <div class="chtag" id="chTag">A. 콤보 지급</div>
+    </div>
+    <div class="chslots" id="chSlots"></div>
+  </div>
+
+  <!-- Board -->
+  <div class="bwrap"><div class="binn"><div class="board" id="board"></div></div></div>
+
+  <!-- Tray -->
+  <div class="tray">
+    <div class="trylbl">🧺 수거된 재료</div>
+    <div class="tryitems" id="trayItems"></div>
+  </div>
+</div>
+
+<!-- Drawer -->
+<div class="drw hid" id="drw">
+  <div class="drwc">
+    <div class="drwh"></div>
+    <div class="drwt">⚙️ 게임 중 설정 조정</div>
+    <div class="sr">
+      <div class="st"><div class="sl">주문 생성 간격</div><div class="sv" id="dvOI">18초</div></div>
+      <input type="range" id="drOI" min="8" max="40" step="2" value="18" oninput="drng('OI',this.value,'초')">
+    </div>
+    <div class="sr">
+      <div class="st"><div class="sl">기구 활성 시간</div><div class="sv" id="dvTA">12초</div></div>
+      <input type="range" id="drTA" min="6" max="25" step="1" value="12" oninput="drng('TA',this.value,'초')">
+    </div>
+    <div class="sr">
+      <div class="st"><div class="sl">뒤집기/젓기 시간</div><div class="sv" id="dvTF">1.5초</div></div>
+      <input type="range" id="drTF" min="1" max="5" step="0.5" value="1.5" oninput="drng('TF',this.value,'초')">
+    </div>
+    <div class="sr">
+      <div class="st"><div class="sl">게임오버 한도</div><div class="sv" id="dvQ">5개</div></div>
+      <input type="range" id="drQ" min="3" max="8" step="1" value="5" oninput="drng('Q',this.value,'개')">
+    </div>
+    <button class="drwok" onclick="closeDrw()">✅ 적용하고 계속</button>
+  </div>
+</div>
+
+<div id="PL"></div>
+
+<script>
+// ══════════════════════════════════════════════
+//  STAGE DATA
+// ══════════════════════════════════════════════
+const STAGES = {
+  burger: {
+    emoji:'🍔', name:'버거',
+    ings:[{id:0,e:'🍞',n:'번'},{id:1,e:'🧀',n:'치즈'},{id:2,e:'🥩',n:'고기',hot:true},
+          {id:3,e:'🥬',n:'양상추'},{id:4,e:'🍅',n:'토마토'}],
+    colors:['linear-gradient(145deg,#e8c070,#b88535)','linear-gradient(145deg,#ffe070,#e0a800)',
+            'linear-gradient(145deg,#e08080,#a82828)','linear-gradient(145deg,#82dc90,#2e8c3a)',
+            'linear-gradient(145deg,#ff9966,#cc3300)'],
+    recipe:{raw:{0:1,1:1,3:1,4:1},hotId:2,hotAmt:1,reward:100,dish:'클래식 버거'},
+    cooker:{em:'🍳',name:'프라이팬',hotEm:'🥩',actEm:'🔄',actLabel:'뒤집기',t1:5,t2:4,tBurn:7},
+    knifeTgt:[3,4], // which ings get x3 by knife
+  },
+  pizza: {
+    emoji:'🍕', name:'피자',
+    ings:[{id:0,e:'🫓',n:'도우'},{id:1,e:'🍅',n:'소스'},{id:2,e:'🧀',n:'치즈',hot:true},
+          {id:3,e:'🍄',n:'버섯'},{id:4,e:'🫑',n:'파프리카'}],
+    colors:['linear-gradient(145deg,#f0d8a0,#c8a040)','linear-gradient(145deg,#ff8855,#cc3300)',
+            'linear-gradient(145deg,#ffe888,#d0a800)','linear-gradient(145deg,#c8a8f8,#7840d0)',
+            'linear-gradient(145deg,#88e888,#208820)'],
+    recipe:{raw:{0:1,1:2,3:1,4:1},hotId:2,hotAmt:2,reward:150,dish:'마르게리타 피자'},
+    cooker:{em:'🔥',name:'오븐',hotEm:'🧀',actEm:null,actLabel:null,t1:8,t2:null,tBurn:8},
+    knifeTgt:[1,4],
+  },
+  ramen: {
+    emoji:'🍜', name:'라면',
+    ings:[{id:0,e:'🍜',n:'면'},{id:1,e:'🥚',n:'달걀'},{id:2,e:'🌱',n:'파'},
+          {id:3,e:'🥩',n:'고기'},{id:4,e:'💧',n:'육수',hot:true}],
+    colors:['linear-gradient(145deg,#f8e870,#c8b820)','linear-gradient(145deg,#ffe0a0,#e0a020)',
+            'linear-gradient(145deg,#c0f0c0,#30a030)','linear-gradient(145deg,#f08080,#a82828)',
+            'linear-gradient(145deg,#a0d0f8,#2888d0)'],
+    recipe:{raw:{0:2,1:1,2:1,3:1},hotId:4,hotAmt:1,reward:120,dish:'특제 라면'},
+    cooker:{em:'🫕',name:'냄비',hotEm:'💧',actEm:'🥢',actLabel:'젓기',t1:6,t2:4,tBurn:6},
+    knifeTgt:[2,3],
+  },
+  bibimbap: {
+    emoji:'🍱', name:'비빔밥',
+    ings:[{id:0,e:'🍚',n:'밥'},{id:1,e:'🥬',n:'나물'},{id:2,e:'🥕',n:'당근'},
+          {id:3,e:'🥚',n:'달걀'},{id:4,e:'🌶️',n:'고추장'}],
+    colors:['linear-gradient(145deg,#f8f0d0,#d8c060)','linear-gradient(145deg,#90e890,#208830)',
+            'linear-gradient(145deg,#f8a840,#d06010)','linear-gradient(145deg,#fff8a0,#e8c820)',
+            'linear-gradient(145deg,#f86060,#b81010)'],
+    recipe:{raw:{0:2,1:2,2:1,3:1,4:1},hotId:null,hotAmt:0,reward:180,dish:'돌솥 비빔밥'},
+    cooker:null,
+    knifeTgt:[1,2],
+  },
+};
+
+// ══════════════════════════════════════════════
+//  CHANCE ITEMS
+// ══════════════════════════════════════════════
+const CITEMS = {
+  knife:     {e:'🔪',name:'셰프의 칼',   color:'#ffe800',flash:'gold'},
+  salt:      {e:'🧂',name:'소금',         color:'#80c8ff',flash:'cyan'},
+  ice:       {e:'🧊',name:'얼음',          color:'#a0d8ff',flash:'cyan'},
+  fork:      {e:'🍴',name:'마법의 포크',  color:'#ff80c8',flash:'pink'},
+  hourglass: {e:'⏰',name:'모래시계',     color:'#60e878',flash:'grn'},
+};
+const CKEYS = Object.keys(CITEMS);
+const BOARD_MAP = {5:'knife',6:'salt',7:'ice',8:'fork',9:'hourglass'};
+
+// ══════════════════════════════════════════════
+//  CFG & SETTINGS STATE
+// ══════════════════════════════════════════════
+let selStage = 'burger';
+let selChanceMode = 'combo'; // combo | timed | order
+const cfg = {win:20,maxQ:5,oi:18,ta:12,tf:1.5,tIdle:10};
+const PRESETS = {
+  easy:  {win:10,maxQ:7,oi:28,ta:18,tf:3,  tIdle:8},
+  normal:{win:20,maxQ:5,oi:18,ta:12,tf:1.5,tIdle:10},
+  hard:  {win:30,maxQ:3,oi:10,ta:8, tf:1,  tIdle:14},
+};
+const MODE_LABELS = {combo:'A. 콤보 지급',timed:'B. 타이머 지급',order:'C. 주문 보상'};
+
+function pickStage(el,id){selStage=id;document.querySelectorAll('.stg-card').forEach(c=>c.classList.remove('on'));el.classList.add('on');updateSum();}
+function pickChance(el,m){selChanceMode=m;document.querySelectorAll('.cm').forEach(c=>c.classList.remove('on'));el.classList.add('on');updateSum();}
+function rng(el,vid,suf){
+  const v=parseFloat(el.value);
+  const k=el.id.replace('r','').toLowerCase();
+  if(k==='win')cfg.win=v;else if(k==='q')cfg.maxQ=v;else if(k==='oi')cfg.oi=v;
+  else if(k==='ta')cfg.ta=v;else if(k==='tf')cfg.tf=v;
+  const mn=parseFloat(el.min),mx=parseFloat(el.max);
+  el.style.setProperty('--pct',((v-mn)/(mx-mn)*100).toFixed(1)+'%');
+  document.getElementById(vid).textContent=v+suf;
+  updateSum();
+}
+function preset(n){
+  document.querySelectorAll('.pb').forEach(b=>b.classList.remove('on'));
+  document.querySelector('.pb.'+n).classList.add('on');
+  Object.assign(cfg,PRESETS[n]);
+  const map={win:['rWin','vWin',''],maxQ:['rQ','vQ',''],oi:['rOI','vOI','초'],ta:['rTA','vTA','초'],tf:['rTF','vTF','초']};
+  Object.entries(map).forEach(([k,[rid,vid,suf]])=>{
+    const el=document.getElementById(rid);if(!el)return;
+    const v=cfg[k];el.value=v;
+    const mn=parseFloat(el.min),mx=parseFloat(el.max);
+    el.style.setProperty('--pct',((v-mn)/(mx-mn)*100).toFixed(1)+'%');
+    document.getElementById(vid).textContent=v+suf;
+  });
+  updateSum();
+}
+function updateSum(){
+  const stg=STAGES[selStage];
+  document.getElementById('sumStg').textContent=stg.emoji+' '+stg.name;
+  document.getElementById('sumCM').textContent=MODE_LABELS[selChanceMode].split('.')[0]+'.'+MODE_LABELS[selChanceMode].split('.')[1];
+  document.getElementById('sumW').textContent=cfg.win+'개';
+  document.getElementById('sumQ').textContent=cfg.maxQ+'개';
+  document.getElementById('sumOI').textContent=cfg.oi+'초';
+  document.getElementById('sumEst').textContent='~'+Math.round(cfg.win*cfg.oi*0.6/60*10)/10+'분';
+}
+function drng(k,v,suf){
+  v=parseFloat(v);
+  if(k==='OI')cfg.oi=v;else if(k==='TA')cfg.ta=v;else if(k==='TF')cfg.tf=v;else if(k==='Q')cfg.maxQ=v;
+  const el=document.getElementById('dr'+k);
+  const mn=parseFloat(el.min),mx=parseFloat(el.max);
+  el.style.setProperty('--pct',((v-mn)/(mx-mn)*100).toFixed(1)+'%');
+  document.getElementById('dv'+k).textContent=v+suf;
+}
+function openDrw(){
+  const m={OI:[cfg.oi,'초'],TA:[cfg.ta,'초'],TF:[cfg.tf,'초'],Q:[cfg.maxQ,'개']};
+  Object.entries(m).forEach(([k,[v,s]])=>{const el=document.getElementById('dr'+k);if(el){el.value=v;drng(k,v,s);}});
+  document.getElementById('drw').classList.remove('hid');paused=true;
+}
+function closeDrw(){document.getElementById('drw').classList.add('hid');paused=false;lt=Date.now();}
+
+// ══════════════════════════════════════════════
+//  GAME STATE
+// ══════════════════════════════════════════════
+const GS=6;
+let stg, grid=[], coll={}, hotCount=0;
+let sel=null, score=0, combo=0, busy=false, drops=new Set();
+let done=0, orders=[], oid=0;
+let over=false, won=false, paused=false;
+let sec=0, lt=Date.now(), orderTmr=0;
+let ckState='idle', ckTmr=0;
+let chSlots=[null,null,null];
+let chSpawnTmr=25;
+
+// ══════════════════════════════════════════════
+//  START
+// ══════════════════════════════════════════════
+function startGame(){
+  stg = STAGES[selStage];
+  document.getElementById('S').style.display='none';
+  document.getElementById('G').style.display='block';
+  document.getElementById('gLogo').textContent=stg.emoji+' '+stg.name;
+  document.getElementById('hDone').textContent='0/'+cfg.win;
+  document.getElementById('chTag').textContent=MODE_LABELS[selChanceMode];
+
+  // Init collection
+  stg.ings.forEach(i=>{ coll[i.id]=0; });
+  hotCount=0;
+
+  // Hide/show cooker
+  const ckel=document.getElementById('cooker');
+  ckel.style.display=stg.cooker?'':'none';
+  if(stg.cooker) ckTmr=cfg.tIdle;
+
+  // Build grid & queue
+  buildGrid(); cleanGrid();
+  orderTmr=2; spawnOrder();
+
+  // Chance spawn timer
+  chSpawnTmr = selChanceMode==='timed' ? 30 : 9999;
+  drawAll(); drawChBar();
+  lt=Date.now();
+  setInterval(tick,100);
+}
+
+// ══════════════════════════════════════════════
+//  TICK
+// ══════════════════════════════════════════════
+function tick(){
+  if(over||won||paused)return;
+  const now=Date.now(), dt=(now-lt)/1000; lt=now;
+  sec+=dt;
+  if(stg.cooker) tickCooker(dt);
+  orderTmr-=dt;
+  if(orderTmr<=0){spawnOrder();orderTmr=cfg.oi;}
+  // Chance spawn timer (timed mode only)
+  if(selChanceMode==='timed'){
+    chSpawnTmr-=dt;
+    if(chSpawnTmr<=0){grantChance();chSpawnTmr=30;}
+  }
+  drawCooker(); drawTimer(); drawQueue();
+}
+function drawTimer(){
+  const m=Math.floor(sec/60),s=Math.floor(sec%60);
+  document.getElementById('hTimer').textContent=String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
+}
+
+// ══════════════════════════════════════════════
+//  COOKER
+// ══════════════════════════════════════════════
+function tickCooker(dt){
+  const c=stg.cooker;
+  if(ckState==='idle'){
+    ckTmr-=dt;
+    if(ckTmr<=0){ckState='active';ckTmr=cfg.ta;document.getElementById('board').classList.add('cka');SFX.panReady();notif(`${c.em} ${c.name} 달궈졌어요!\n재료를 올리세요!`);}
+  } else if(ckState==='active'){
+    ckTmr-=dt;if(ckTmr<=0)burnCk();
+  } else if(ckState==='cooking'){   // oven: no flip
+    ckTmr-=dt;if(ckTmr<=0)finishCk();
+  } else if(ckState==='cooking1'){ // pan/pot: need flip/stir
+    ckTmr-=dt;if(ckTmr<=0){ckState='flip';ckTmr=cfg.tf;SFX.flipAlert();notif(`${c.actEm} ${c.actLabel} 타이밍!`);}
+  } else if(ckState==='flip'){
+    ckTmr-=dt;if(ckTmr<=0)burnCk();
+  } else if(ckState==='cooking2'){
+    ckTmr-=dt;if(ckTmr<=0)finishCk();
+  } else if(ckState==='burned'){
+    ckTmr-=dt;if(ckTmr<=0){ckState='idle';ckTmr=cfg.tIdle;}
+  }
+}
+function burnCk(){ckState='burned';ckTmr=stg.cooker.tBurn;document.getElementById('board').classList.remove('cka');notif('💨 타버렸어요!');flash('red');SFX.burn();}
+function finishCk(){hotCount++;ckState='idle';ckTmr=cfg.tIdle;document.getElementById('board').classList.remove('cka');notif('✅ 완성!');tryServe();drawAll();}
+document.getElementById('cooker').addEventListener('click',()=>{
+  if(ckState==='flip'){ckState='cooking2';ckTmr=stg.cooker.t2;SFX.flipOk();notif('✅ '+stg.cooker.actLabel+' 성공!');}
+});
+function drawCooker(){
+  if(!stg||!stg.cooker)return;
+  const c=stg.cooker;
+  const el=document.getElementById('cooker');
+  el.querySelectorAll('.stm,.ahint').forEach(e=>e.remove());
+  // map ckState → CSS class
+  const cls = ckState==='flip'?'flip':ckState;
+  el.className='ckr '+cls;
+  const T1=c.t1, T2=c.t2||4, TB=c.tBurn;
+  const SD={
+    idle:    {ic:c.em, t:`${c.name} 준비 중...`,          sb:'잠시 후 달궈집니다',              pct:(cfg.tIdle-ckTmr)/cfg.tIdle*100, sh:ckTmr},
+    active:  {ic:'🔥', t:`${c.name} 달궈졌어요!`,         sb:`${c.hotEm} 재료를 매칭하세요!`,  pct:ckTmr/cfg.ta*100,                sh:ckTmr},
+    cooking: {ic:c.em, t:'굽는 중...',                     sb:'다 될 때까지 기다리세요!',        pct:(T1-ckTmr)/T1*100,               sh:ckTmr},
+    cooking1:{ic:c.em, t:'앞면 익는 중...',                sb:`완성 후 ${c.actLabel}!`,          pct:(T1-ckTmr)/T1*100,               sh:ckTmr},
+    flip:    {ic:c.em, t:`👆 탭해서 ${c.actLabel}!`,       sb:'안하면 타버려요!',                pct:ckTmr/cfg.tf*100,                sh:ckTmr},
+    cooking2:{ic:c.em, t:'뒷면 익는 중...',                sb:'거의 다 됐어요!',                 pct:(T2-ckTmr)/T2*100,               sh:ckTmr},
+    burned:  {ic:'💨', t:'타버렸어요!',                    sb:'잠시 후 다시 달궈집니다',         pct:ckTmr/TB*100,                    sh:ckTmr},
+  };
+  const d=SD[ckState]||SD.idle;
+  document.getElementById('cIcon').textContent=d.ic;
+  document.getElementById('cTitle').textContent=d.t;
+  document.getElementById('cSub').textContent=d.sb;
+  document.getElementById('tFil').style.width=Math.max(0,Math.min(100,d.pct))+'%';
+  document.getElementById('tTxt').textContent=d.sh.toFixed(1)+'s';
+  if(['cooking','cooking1','cooking2'].includes(ckState))
+    for(let i=0;i<3;i++){const s=document.createElement('div');s.className='stm';s.textContent='♨️';el.appendChild(s);}
+  if(ckState==='flip'&&c.actEm){const h=document.createElement('div');h.className='ahint';h.textContent=c.actEm+' '+c.actLabel+'!';el.appendChild(h);}
+}
+
+// ══════════════════════════════════════════════
+//  ORDERS
+// ══════════════════════════════════════════════
+function spawnOrder(){
+  if(over||won)return;
+  if(orders.length>=cfg.maxQ){endGame('lose','주문이 너무 밀렸어요! 😱');return;}
+  orders.push({id:oid++}); drawQueue();
+}
+function drawQueue(){
+  const el=document.getElementById('qSlots'); el.innerHTML='';
+  document.getElementById('qWarn').style.display=orders.length>=cfg.maxQ-1?'':'none';
+  for(let i=0;i<cfg.maxQ;i++){
+    const s=document.createElement('div');
+    if(orders[i]){
+      const urg=orders.length>=cfg.maxQ-1&&i===0;
+      s.className='qs filled'+(urg?' urg':'');
+      s.dataset.id=orders[i].id;
+      const r=stg.recipe;
+      const dots=[];
+      Object.keys(r.raw).forEach(id=>dots.push({done:(coll[id]||0)>=r.raw[id]}));
+      if(r.hotId!==null) dots.push({done:hotCount>=r.hotAmt,ck:true});
+      s.innerHTML=`<div class="qd">${stg.emoji}</div>
+        <div class="qp">${dots.map(d=>`<div class="qdt${d.ck?' ck':''}${d.done?' dn':''}"></div>`).join('')}</div>
+        <div class="qn">#${orders[i].id+1}</div>`;
+    } else {
+      s.className='qs empty';
+    }
+    el.appendChild(s);
+  }
+}
+function tryServe(){
+  if(!orders.length)return;
+  const r=stg.recipe;
+  const rawOk=Object.keys(r.raw).every(id=>(coll[id]||0)>=r.raw[id]);
+  const hotOk=r.hotId===null||(hotCount>=r.hotAmt);
+  if(rawOk&&hotOk){
+    Object.keys(r.raw).forEach(id=>coll[id]-=r.raw[id]);
+    if(r.hotId!==null) hotCount-=r.hotAmt;
+    serveOrder();
+  }
+}
+function serveOrder(){
+  const o=orders.shift(); done++; score+=stg.recipe.reward;
+  document.getElementById('hScore').textContent=score.toLocaleString();
+  document.getElementById('hDone').textContent=done+'/'+cfg.win;
+  const s=document.querySelector(`.qs[data-id="${o.id}"]`);
+  if(s){s.classList.add('out');setTimeout(()=>drawQueue(),340);}else drawQueue();
+  fpop(`${stg.emoji}완성! +${stg.recipe.reward}`,innerWidth/2-60,innerHeight*.38,'#4CAF50','17px');
+  flash('gold'); SFX.serve();
+  // order-mode chance
+  if(selChanceMode==='order') grantChance();
+  if(done>=cfg.win){setTimeout(()=>endGame('win'),380);return;}
+  setTimeout(()=>{tryServe();drawAll();},450);
+}
+
+// ══════════════════════════════════════════════
+//  CHANCE SYSTEM
+// ══════════════════════════════════════════════
+function randChanceKey(){
+  const keys=stg.chanceItems||CKEYS;
+  return keys[Math.floor(Math.random()*keys.length)];
+}
+function grantChance(){
+  const slot=chSlots.indexOf(null);
+  if(slot===-1)return;
+  chSlots[slot]=randChanceKey();
+  SFX.chanceGet();
+  drawChBar();
+}
+function drawChBar(){
+  const el=document.getElementById('chSlots'); el.innerHTML='';
+  // Slot-based modes (B/C/D)
+  chSlots.forEach((k,i)=>{
+    const d=document.createElement('div');
+    if(k){
+      d.className='chs ready';
+      d.textContent=CITEMS[k].e;
+      d.title=CITEMS[k].name;
+      d.onclick=()=>useChance(i);
+    } else {
+      d.className='chs empty';
+      d.textContent='';
+    }
+    el.appendChild(d);
+  });
+}
+function useChance(slotIdx){
+  const k=chSlots[slotIdx]; if(!k)return;
+  chSlots[slotIdx]=null;
+  activateChance(k);
+  drawChBar();
+}
+function activateChance(key){
+  const ci=CITEMS[key]; flash(ci.flash); SFX.chanceUse();
+  let title=ci.e+' '+ci.name+'!', desc='';
+  if(key==='knife'){
+    // Give x3 of knife targets
+    const tgts=stg.knifeTgt||[3,4];
+    tgts.forEach(id=>{coll[id]=(coll[id]||0)+3;});
+    const names=tgts.map(id=>stg.ings.find(i=>i.id===id)).filter(Boolean);
+    desc=names.map(i=>`${i.e}×3`).join(' + ')+' 즉시 수거!';
+  } else if(key==='salt'){
+    if(ckState==='cooking1'){ckTmr=Math.min(ckTmr,stg.cooker.t1*0.45);}
+    else if(ckState==='cooking2'){ckTmr=Math.min(ckTmr,stg.cooker.t2*0.45);}
+    else if(ckState==='cooking'){ckTmr=Math.min(ckTmr,stg.cooker.t1*0.45);}
+    desc='굽는 시간 즉시 절반!';
+  } else if(key==='ice'){
+    orderTmr+=10; desc='주문 생성 +10초 동결!';
+    fpop('⏸ +10초',innerWidth/2-40,innerHeight*.44,ci.color,'17px');
+  } else if(key==='fork'){
+    // collect all of most abundant ing
+    const cnts={};
+    for(let r=0;r<GS;r++)for(let c=0;c<GS;c++){const t=grid[r][c];if(t>=0&&t<=4)cnts[t]=(cnts[t]||0)+1;}
+    let bT=0,bC=0;
+    Object.entries(cnts).forEach(([t,c])=>{if(c>bC){bC=c;bT=parseInt(t);}});
+    const hIng=stg.ings.find(i=>i.id===bT);
+    let collected=0;
+    for(let r=0;r<GS;r++)for(let c=0;c<GS;c++){
+      if(grid[r][c]===bT){
+        if(!hIng?.hot) coll[bT]=(coll[bT]||0)+1;
+        grid[r][c]=-1; drops.add(`${r},${c}`); collected++;
+      }
+    }
+    gravity(); fillGrid();
+    desc=`${hIng?.e||'?'} ×${collected} 전부 수거!`;
+    fpop(`${hIng?.e||'?'}×${collected}`,innerWidth/2-36,innerHeight*.44,ci.color,'20px');
+  } else if(key==='hourglass'){
+    if(ckState==='flip'){ckTmr=Math.min(ckTmr+cfg.tf*2,cfg.tf*3);}
+    desc='뒤집기/젓기 시간 3배 연장!';
+  }
+  showChFx(title,desc,ci.color);
+  drawAll(); tryServe();
+}
+function showChFx(title,desc,color){
+  const el=document.createElement('div');el.className='chfx';
+  el.style.borderColor=color;el.style.color=color;
+  el.innerHTML=`<div>${title}</div><div style="font-size:11px;color:rgba(255,255,255,.78);font-family:Nunito,sans-serif;font-weight:800;margin-top:4px;">${desc}</div>`;
+  document.getElementById('PL').appendChild(el);
+  setTimeout(()=>el.remove(),1700);
+}
+
+// ══════════════════════════════════════════════
+//  GRID
+// ══════════════════════════════════════════════
+function randIng(){return Math.floor(Math.random()*stg.ings.length);}
+function buildGrid(){grid=Array.from({length:GS},()=>Array.from({length:GS},()=>randIng()));}
+function makes3(r,c,t){
+  if(t>4)return false;
+  if(c>=2&&grid[r][c-1]===t&&grid[r][c-2]===t)return true;
+  if(r>=2&&grid[r-1][c]===t&&grid[r-2][c]===t)return true;
+  return false;
+}
+function cleanGrid(){
+  for(let r=0;r<GS;r++)for(let c=0;c<GS;c++){
+    let tries=0; while(makes3(r,c,grid[r][c])&&tries++<20)grid[r][c]=randIng();
+  }
+}
+function gravity(){
+  for(let c=0;c<GS;c++){
+    let wr=GS-1;
+    for(let r=GS-1;r>=0;r--)if(grid[r][c]!==-1){grid[wr][c]=grid[r][c];if(wr!==r)grid[r][c]=-1;wr--;}
+    for(let r=wr;r>=0;r--)grid[r][c]=-1;
+  }
+}
+function fillGrid(){
+  const r=stg.recipe;
+  const hotIng=stg.ings.find(i=>i.hot);
+  const pool=[];
+
+  stg.ings.forEach(i=>{
+    let w;
+    if(i.hot && stg.cooker){
+      // Hot ingredient: weight based on how many more we need to cook
+      const stillNeed=Math.max(0, r.hotAmt - hotCount);
+      w = stillNeed > 0 ? 3 : 1;
+      if(ckState==='active') w = Math.max(w, 6); // big boost when pan is hot
+    } else {
+      // Regular: deficit = needed per order - currently collected
+      const need = r.raw[i.id] || 0;
+      const have = coll[i.id] || 0;
+      // Weight = base 2 + large bonus per missing unit
+      const deficit = Math.max(0, need - have);
+      w = 2 + deficit * 3;
+    }
+    for(let k=0;k<Math.ceil(w*4);k++) pool.push(i.id);
+  });
+
+  for(let row=0;row<GS;row++)for(let col=0;col<GS;col++){
+    if(grid[row][col]===-1){
+      grid[row][col]=pool[Math.floor(Math.random()*pool.length)];
+      drops.add(`${row},${col}`);
+    }
+  }
+}
+
+// ══════════════════════════════════════════════
+//  DEADLOCK DETECTION & SHUFFLE
+// ══════════════════════════════════════════════
+function hasAnyMove(){
+  for(let r=0;r<GS;r++){
+    for(let c=0;c<GS-1;c++){
+      swapTiles({r,c},{r,c:c+1});
+      const ok=findMatches().length>0;
+      swapTiles({r,c},{r,c:c+1});
+      if(ok)return true;
+    }
+  }
+  for(let r=0;r<GS-1;r++){
+    for(let c=0;c<GS;c++){
+      swapTiles({r,c},{r:r+1,c});
+      const ok=findMatches().length>0;
+      swapTiles({r,c},{r:r+1,c});
+      if(ok)return true;
+    }
+  }
+  return false;
+}
+async function checkAndShuffle(){
+  if(hasAnyMove()) return;
+  notif('🔀 이동 불가! 보드를 섞습니다...');
+  SFX.shuffle();
+  await w(900);
+  // collect all tile values, shuffle
+  const flat=[];
+  for(let r=0;r<GS;r++)for(let c=0;c<GS;c++)flat.push(grid[r][c]);
+  for(let i=flat.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [flat[i],flat[j]]=[flat[j],flat[i]];
+  }
+  let idx=0;
+  for(let r=0;r<GS;r++)for(let c=0;c<GS;c++){grid[r][c]=flat[idx++];drops.add(`${r},${c}`);}
+  // If still stuck after shuffle, inject some variety
+  let tries=0;
+  while(!hasAnyMove()&&tries++<30){
+    const r=Math.floor(Math.random()*GS),c=Math.floor(Math.random()*GS);
+    grid[r][c]=randIng();drops.add(`${r},${c}`);
+  }
+  drawBoard();
+  // Check for auto-chains after shuffle
+  await w(300);
+  const chain=findMatches();
+  if(chain.length){combo=0;resolveMatches(chain);}
+}
+function drawAll(){drawBoard();drawTray();drawQueue();}
+
+function drawBoard(){
+  const el=document.getElementById('board'); el.innerHTML='';
+  const hotIng=stg.ings.find(i=>i.hot);
+  for(let r=0;r<GS;r++)for(let c=0;c<GS;c++){
+    const t=grid[r][c];
+    const div=document.createElement('div');
+    div.className='tile';div.dataset.r=r;div.dataset.c=c;
+    // color
+    if(t>=5){
+      div.classList.add('tc'+t);
+      div.textContent=CITEMS[BOARD_MAP[t]]?.e||'?';
+    } else {
+      div.style.background=stg.colors[t]||'#888';
+      div.textContent=stg.ings[t]?.e||'?';
+      if(hotIng&&t===hotIng.id) div.classList.add('cookable');
+    }
+    if(sel&&sel.r===r&&sel.c===c) div.classList.add('sel');
+    if(drops.has(`${r},${c}`)){div.classList.add('drop');SFX.drop();}
+    div.addEventListener('click',()=>onTile(r,c));
+    el.appendChild(div);
+  }
+  drops.clear();
+}
+
+function drawTray(){
+  const el=document.getElementById('trayItems'); el.innerHTML='';
+  const r=stg.recipe;
+  const hotIng=stg.ings.find(i=>i.hot);
+  stg.ings.forEach(i=>{
+    if(i.hot&&stg.cooker) return; // handled separately
+    const v=coll[i.id]||0;
+    const need=r.raw[i.id]||0;
+    const hi=v>=need&&need>0;
+    el.innerHTML+=`<div class="ti"><div class="te">${i.e}</div><div class="tn${hi?' hi':''}">${v}</div></div>`;
+  });
+  if(hotIng&&stg.cooker){
+    const ck=['cooking','cooking1','flip','cooking2'].includes(ckState);
+    const hi=hotCount>=r.hotAmt;
+    el.innerHTML+=`<div class="tck"><div class="tcktp"><div class="te">${hotIng.e}</div><span class="tckbg">익힘</span></div>
+      <div class="tckn${hi?' hi':''}">${ck?'🔥':hotCount}</div></div>`;
+  }
+}
+
+// ══════════════════════════════════════════════
+//  INPUT
+// ══════════════════════════════════════════════
+function onTile(r,c){
+  if(busy||over||won||paused)return;
+  if(!sel){sel={r,c};SFX.select();drawBoard();return;}
+  if(sel.r===r&&sel.c===c){sel=null;drawBoard();return;}
+  if(Math.abs(r-sel.r)+Math.abs(c-sel.c)===1){
+    const f={...sel};sel=null;doSwap(f,{r,c});
+  } else {
+    sel={r,c};SFX.select();drawBoard();
+  }
+}
+function doSwap(a,b){
+  busy=true; swapTiles(a,b);
+  const hits=findMatches();
+  if(!hits.length){
+    swapTiles(a,b);busy=false;drawBoard();
+    SFX.fail();
+    [te(a.r,a.c),te(b.r,b.c)].forEach(e=>{if(e){e.classList.add('shk');setTimeout(()=>e.classList.remove('shk'),250);}});
+    if(!hasAnyMove()){checkAndShuffle();}
+    return;
+  }
+  combo=0;drawBoard();resolveMatches(hits);
+}
+function swapTiles(a,b){const t=grid[a.r][a.c];grid[a.r][a.c]=grid[b.r][b.c];grid[b.r][b.c]=t;}
+function te(r,c){return document.querySelector(`.tile[data-r="${r}"][data-c="${c}"]`);}
+
+function findMatches(){
+  const hit=new Set();
+  for(let r=0;r<GS;r++){
+    let run=1;
+    for(let c=1;c<GS;c++){
+      if(grid[r][c]!==-1&&grid[r][c]===grid[r][c-1])run++;
+      else{if(run>=3)for(let k=c-run;k<c;k++)hit.add(`${r},${k}`);run=1;}
+    }
+    if(run>=3)for(let k=GS-run;k<GS;k++)hit.add(`${r},${k}`);
+  }
+  for(let c=0;c<GS;c++){
+    let run=1;
+    for(let r=1;r<GS;r++){
+      if(grid[r][c]!==-1&&grid[r][c]===grid[r-1][c])run++;
+      else{if(run>=3)for(let k=r-run;k<r;k++)hit.add(`${k},${c}`);run=1;}
+    }
+    if(run>=3)for(let k=GS-run;k<GS;k++)hit.add(`${k},${c}`);
+  }
+  return[...hit].map(k=>{const[r,c]=k.split(',').map(Number);return{r,c};});
+}
+
+async function resolveMatches(hits){
+  combo++;
+  SFX.pop(Math.min(hits.length,5));
+  if(combo>=2){
+    SFX.combo(combo);
+    fpop(['','','DOUBLE!🔥','TRIPLE!💥','QUAD!⚡','FEVER!🌟'][Math.min(combo,5)]||`${combo}×COMBO`,innerWidth/2-48,innerHeight*.43,var_yw,'34px');
+  }
+
+  let hotHit=0;
+  const hotIng=stg.ings.find(i=>i.hot);
+  hits.forEach(({r,c})=>{
+    const t=grid[r][c];
+    if(hotIng&&t===hotIng.id)hotHit++;
+    else if(t>=0&&t<=4){coll[t]=(coll[t]||0)+1; SFX.collect();}
+  });
+
+  if(hotHit>0){
+    if(ckState==='active'){
+      // has t2 = needs flip, otherwise direct oven
+      ckState=stg.cooker.t2?'cooking1':'cooking';
+      ckTmr=stg.cooker.t1;
+      document.getElementById('board').classList.remove('cka');
+      fpop(`${hotIng.e}→🔥`,innerWidth/2-32,innerHeight*.43,'#FFB570','14px');
+    } else {
+      fpop(`${hotIng.e} ❌팬없음`,innerWidth/2-50,innerHeight*.44,'#ff6060','13px');
+    }
+  }
+
+  const pts=hits.length*10*Math.min(combo,5); score+=pts;
+  fpop((combo>=2?`×${combo} `:'')+`+${pts}`,innerWidth/2-28,innerHeight*.47,combo>=3?'#FF6B35':var_yw,combo>=3?'23px':'17px');
+  document.getElementById('hScore').textContent=score.toLocaleString();
+
+  // Animate
+  hits.forEach(({r,c})=>{
+    const el=te(r,c); const t=grid[r][c];
+    if(el){
+      if(t>=5)el.classList.add('cburst');
+      else{particles(el,stg.ings[t]?.e||'✨');el.classList.add('pop');}
+    }
+  });
+  await w(310);
+  hits.forEach(({r,c})=>grid[r][c]=-1);
+  gravity(); fillGrid(); drawAll(); tryServe();
+
+  // Combo chance grant
+  if(selChanceMode==='combo'&&combo>=3) grantChance();
+
+  await w(250);
+  const chain=findMatches();
+  if(chain.length){await w(80);resolveMatches(chain);}
+  else{combo=0;busy=false;drawAll(); await checkAndShuffle();}
+}
+
+// ══════════════════════════════════════════════
+//  WIN / LOSE
+// ══════════════════════════════════════════════
+function endGame(result,msg=''){
+  if(over||won)return;
+  if(result==='win')won=true; else over=true;
+  if(result==='lose'){flash('red');SFX.over();}else{SFX.win();}
+  setTimeout(()=>{
+    const m=Math.floor(sec/60),s=Math.floor(sec%60);
+    const isWin=result==='win';
+    const ov=document.createElement('div');ov.className='ov';
+    ov.innerHTML=`<div class="ovc ${result}">
+      <div class="ove">${isWin?'🏆':'😱'}</div>
+      <div class="ovt">${isWin?'클리어!':'게임 오버!'}</div>
+      <div class="ovs">${isWin?stg.recipe.dish+' '+cfg.win+'개 완성!':msg}</div>
+      <div class="ovst">
+        ⏱ ${isWin?'클리어':'생존'} 타임: ${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}<br>
+        ${stg.emoji} 완성: ${done}/${cfg.win}<br>
+        🏆 점수: ${score.toLocaleString()}점<br>
+        ⚡ 찬스: ${MODE_LABELS[selChanceMode]}
+      </div>
+      <div class="ovbs">
+        <button class="ovb s" onclick="location.reload()">⚙️ 설정 변경</button>
+        <button class="ovb p" onclick="location.reload()">🔄 다시 하기</button>
+      </div>
+    </div>`;
+    document.body.appendChild(ov);
+  },result==='lose'?400:0);
+}
+
+// ══════════════════════════════════════════════
+//  SOUND ENGINE (Web Audio API)
+// ══════════════════════════════════════════════
+let _ac = null;
+function ac(){
+  if(!_ac) _ac = new (window.AudioContext||window.webkitAudioContext)();
+  // Resume if suspended (browser autoplay policy)
+  if(_ac.state==='suspended') _ac.resume();
+  return _ac;
+}
+
+// Core synth: oscillator + envelope
+function synth(freq, type='sine', vol=0.35, dur=0.18, detune=0){
+  try{
+    const a=ac(), o=a.createOscillator(), g=a.createGain();
+    o.connect(g); g.connect(a.destination);
+    o.type=type; o.frequency.setValueAtTime(freq,a.currentTime);
+    if(detune) o.detune.setValueAtTime(detune,a.currentTime);
+    g.gain.setValueAtTime(0,a.currentTime);
+    g.gain.linearRampToValueAtTime(vol,a.currentTime+0.01);
+    g.gain.exponentialRampToValueAtTime(0.001,a.currentTime+dur);
+    o.start(a.currentTime); o.stop(a.currentTime+dur+0.02);
+  }catch(e){}
+}
+
+// Multi-note chord
+function chord(freqs, type='sine', vol=0.22, dur=0.22){
+  freqs.forEach((f,i)=>setTimeout(()=>synth(f,type,vol,dur),i*18));
+}
+
+// Noise burst (sizzle/burn)
+function noise(vol=0.2, dur=0.22, freq=800){
+  try{
+    const a=ac(), buf=a.createBuffer(1,a.sampleRate*dur,a.sampleRate);
+    const d=buf.getChannelData(0);
+    for(let i=0;i<d.length;i++) d[i]=(Math.random()*2-1);
+    const src=a.createBufferSource();
+    src.buffer=buf;
+    const filt=a.createBiquadFilter(); filt.type='bandpass'; filt.frequency.value=freq; filt.Q.value=1.5;
+    const g=a.createGain();
+    src.connect(filt); filt.connect(g); g.connect(a.destination);
+    g.gain.setValueAtTime(vol,a.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001,a.currentTime+dur);
+    src.start(); src.stop(a.currentTime+dur+0.02);
+  }catch(e){}
+}
+
+const SFX = {
+  // 타일 선택
+  select(){synth(440,'sine',0.18,0.08);},
+  // 매치 성공 (팝!)
+  pop(count=3){
+    const base=[280,350,440,520,600];
+    for(let i=0;i<Math.min(count,5);i++) setTimeout(()=>synth(base[i],'triangle',0.25,0.1),i*28);
+  },
+  // 스왑 실패
+  fail(){synth(180,'sawtooth',0.2,0.14,0);setTimeout(()=>synth(140,'sawtooth',0.15,0.1),80);},
+  // 콤보 팡파레
+  combo(n){
+    const scales={
+      2:[523,659],
+      3:[523,659,784],
+      4:[523,659,784,1047],
+      5:[523,659,784,1047,1319],
+    };
+    const notes=scales[Math.min(n,5)]||scales[2];
+    notes.forEach((f,i)=>setTimeout(()=>synth(f,'sine',0.28,0.15),i*60));
+  },
+  // 재료 수거
+  collect(){synth(660,'sine',0.18,0.09);},
+  // 주문 완성
+  serve(){chord([523,659,784,1047],'sine',0.26,0.26);setTimeout(()=>synth(1319,'sine',0.22,0.2),180);},
+  // 팬 뒤집기 타이밍
+  flipAlert(){
+    synth(880,'square',0.2,0.07);
+    setTimeout(()=>synth(1100,'square',0.2,0.07),90);
+    setTimeout(()=>synth(880,'square',0.2,0.07),180);
+  },
+  // 뒤집기 성공
+  flipOk(){synth(1047,'sine',0.25,0.12);setTimeout(()=>synth(1319,'sine',0.2,0.12),80);},
+  // 타버림
+  burn(){noise(0.28,0.32,600);setTimeout(()=>synth(130,'sawtooth',0.2,0.22),60);},
+  // 팬 달궈짐
+  panReady(){synth(660,'triangle',0.2,0.1);setTimeout(()=>synth(880,'triangle',0.2,0.12),100);},
+  // 찬스 아이템 획득
+  chanceGet(){chord([784,988,1175],'sine',0.24,0.18);},
+  // 찬스 아이템 발동
+  chanceUse(){chord([1047,1319,1568],'sine',0.28,0.22);setTimeout(()=>synth(2093,'sine',0.18,0.18),200);},
+  // 주문 경고
+  queueWarn(){synth(220,'square',0.2,0.08);setTimeout(()=>synth(220,'square',0.18,0.08),160);},
+  // 셔플
+  shuffle(){
+    for(let i=0;i<5;i++) setTimeout(()=>synth(200+Math.random()*400,'triangle',0.12,0.08),i*55);
+  },
+  // 게임 클리어
+  win(){
+    const m=[523,659,784,1047,1319,1568,2093];
+    m.forEach((f,i)=>setTimeout(()=>synth(f,'sine',0.3,0.28),i*90));
+    setTimeout(()=>chord([523,659,784,1047],'sine',0.3,0.5),700);
+  },
+  // 게임오버
+  over(){
+    const m=[440,392,349,330,294,262];
+    m.forEach((f,i)=>setTimeout(()=>synth(f,'sawtooth',0.22,0.18),i*80));
+    setTimeout(()=>noise(0.25,0.4,300),500);
+  },
+  // 타일 낙하
+  drop(){synth(300,'triangle',0.1,0.06);},
+};
+
+
+const var_yw='#FFD23F';
+function fpop(txt,x,y,color,size){
+  const p=document.createElement('div');p.className='fp sc';
+  p.style.cssText=`left:${x}px;top:${y}px;color:${color};font-size:${size};`;
+  p.textContent=txt;document.getElementById('PL').appendChild(p);setTimeout(()=>p.remove(),850);}
+function notif(msg){
+  const p=document.createElement('div');p.className='fp nt';
+  p.innerHTML=msg.replace('\n','<br>');document.getElementById('PL').appendChild(p);setTimeout(()=>p.remove(),1550);}
+function flash(type){const f=document.createElement('div');f.className='flash '+type;document.body.appendChild(f);setTimeout(()=>f.remove(),380);}
+function particles(el,em){
+  const rect=el.getBoundingClientRect();const cx=rect.left+rect.width/2,cy=rect.top+rect.height/2;
+  for(let i=0;i<4;i++){
+    const p=document.createElement('div');
+    const a=Math.PI*2*i/4+Math.random()*.4,d=18+Math.random()*18;
+    p.style.cssText=`position:fixed;left:${cx}px;top:${cy}px;font-size:12px;pointer-events:none;z-index:600;animation:pfly .48s ease forwards;`;
+    p.textContent=em;p.style.setProperty('--dx',Math.cos(a)*d+'px');p.style.setProperty('--dy',Math.sin(a)*d+'px');
+    document.body.appendChild(p);setTimeout(()=>p.remove(),520);
+  }
+}
+function w(ms){return new Promise(r=>setTimeout(r,ms));}
+
+const ks=document.createElement('style');
+ks.textContent='@keyframes pfly{from{transform:translate(0,0) scale(1);opacity:1;}to{transform:translate(var(--dx),var(--dy)) scale(0);opacity:0;}}';
+document.head.appendChild(ks);
+
+// Init sliders display
+['rWin','rQ','rOI','rTA','rTF'].forEach(id=>{
+  const el=document.getElementById(id);
+  const mn=parseFloat(el.min),mx=parseFloat(el.max),v=parseFloat(el.value);
+  el.style.setProperty('--pct',((v-mn)/(mx-mn)*100).toFixed(1)+'%');
+});
+updateSum();
+</script>
+</body>
+</html>
